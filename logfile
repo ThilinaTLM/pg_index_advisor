@@ -1,0 +1,6 @@
+[2023-06-03 11:04:09.761 +0530] [34132] [647ad0d1.8554]: LOG:  starting PostgreSQL 13.10 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 12.2.1 20230201, 64-bit
+[2023-06-03 11:04:09.763 +0530] [34132] [647ad0d1.8554]: LOG:  listening on IPv6 address "::1", port 28813
+[2023-06-03 11:04:09.763 +0530] [34132] [647ad0d1.8554]: LOG:  listening on IPv4 address "127.0.0.1", port 28813
+[2023-06-03 11:04:09.768 +0530] [34132] [647ad0d1.8554]: LOG:  listening on Unix socket "/home/tlm/.pgx/.s.PGSQL.28813"
+[2023-06-03 11:04:09.773 +0530] [34133] [647ad0d1.8555]: LOG:  database system was shut down at 2023-06-03 10:51:01 +0530
+[2023-06-03 11:04:09.777 +0530] [34132] [647ad0d1.8554]: LOG:  database system is ready to accept connections
