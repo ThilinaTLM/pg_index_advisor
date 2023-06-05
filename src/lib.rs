@@ -1,9 +1,9 @@
-mod query;
-
 use pgx::prelude::*;
-use sqlparser::parser::Parser;
+use sqlparser::ast::{Expr, ObjectName, SelectItem, Statement, Table, TableFactor};
 use sqlparser::dialect::PostgreSqlDialect;
-use sqlparser::ast::{ObjectName, Expr, SelectItem, Table, TableFactor, Statement};
+use sqlparser::parser::Parser;
+
+mod query;
 
 pgx::pg_module_magic!();
 
@@ -53,16 +53,16 @@ fn collect_statistics(statement: &sqlparser::ast::Statement) -> Result<String, S
 
             (table_name)
             // (table_name, column_name)
-        },
+        }
         _ => return Err("Invalid statement type".to_string()),
     };
-    
+
     // let table_stats_query = format!("SELECT reltuples, relpages FROM pg_class WHERE oid = '{}'::regclass", table_name);
     // let column_stats_query = format!("SELECT n_distinct, most_common_vals, most_common_freqs FROM pg_statistic JOIN pg_attribute ON pg_statistic.starelid = pg_attribute.attrelid AND pg_statistic.staattnum = pg_attribute.attnum WHERE pg_statistic.starelid = '{}'::regclass AND pg_attribute.attname = '{}'", table_name, column_name);
-    
+
     // let table_stats = Spi::get_one::<(f64, i32)>(&table_stats_query).map_err(|e| format!("Error fetching table statistics: {}", e))?;
     // let column_stats = Spi::get_one::<(f64, Option<Vec<f64>>, Option<Vec<f64>>)>(&column_stats_query).map_err(|e| format!("Error fetching column statistics: {}", e))?;
-    
+
     // Ok(Statistics {
     //     table_name,
     //     column_name,
@@ -89,19 +89,18 @@ fn suggest_indexes(statement: &sqlparser::ast::Statement, stats: &Statistics) ->
     // Implement your index suggestion logic based on the collected statistics
     // For example, you can decide to suggest an index if the selectivity is above a certain threshold
     // This is a simple example and may not be sufficient for all use cases
-    
+
     let selectivity_threshold = 0.1; // You can adjust this based on your requirements
-    
+
     // Calculate the estimated selectivity (in this simple example, we assume uniform distribution)
     let selectivity = 1.0 / stats.n_distinct;
-    
+
     if selectivity > selectivity_threshold {
         Ok(format!("Suggest creating an index on column '{}' of table '{}'", stats.column_name, stats.table_name))
     } else {
         Ok("No index suggestion".to_string())
     }
 }
-
 
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -113,7 +112,6 @@ mod tests {
     fn test_hello_pg_index_advisor() {
         assert_eq!("Hello, pg_index_advisor", crate::hello_pg_index_advisor());
     }
-
 }
 
 /// This module is required by `cargo pgx test` invocations. 

@@ -1,4 +1,5 @@
-use sqlparser::ast::{Query, SetExpr};
+use sqlparser::ast::{Query, SetExpr, TableWithJoins};
+
 use crate::query::*;
 
 impl QueryUsageAnalyzer {
@@ -17,19 +18,29 @@ impl QueryUsageAnalyzer {
                 sqlparser::ast::Statement::Query(query) => {
                     match *query.body {
                         SetExpr::Select(select) => {
-                            for item in &select.from {
-                                match item.relation {
-                                    TableFactor::Table { ref name, .. } => {
-                                        self.table_usages.push(TableUsage {
-                                            name: name.to_string(),
-                                            usages: Vec::new(),
-                                        });
-                                    },
-                                    _ => {},
+                            let table_name = match &select.from.first() {
+                                Some(TableWithJoins { ref relation, .. }) => {
+                                    match relation {
+                                        TableFactor::Table { ref name, .. } => name.to_string(),
+                                        _ => return Err("Invalid table name".to_string()),
+                                    }
                                 }
-                            }
-                        },
-                        _ => {},
+                                _ => return Err("Invalid table name".to_string()),
+                            };
+
+                            // Handle selection (WHERE clause)
+                            let column_usages = if let Some(expr) = select.selection {
+                                self.analyze_where_clause(&expr).unwrap_or(Vec::new())
+                            } else {
+                                Vec::new()
+                            };
+
+                            self.table_usages.push(TableUsage {
+                                name: table_name.to_string(),
+                                usages: column_usages,
+                            });
+                        }
+                        _ => {}
                     }
                 }
                 sqlparser::ast::Statement::Insert { table_name, .. } => {
