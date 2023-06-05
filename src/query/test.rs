@@ -5,8 +5,8 @@ mod tests {
     #[test]
     fn test_select_query_001() {
         let query = "SELECT * FROM users;";
-        let mut analyzer = QueryUsageAnalyzer::new();
-        let result = analyzer.analyze(query);
+        let mut parser = QueryUsageParser::new();
+        let result = parser.parse(query);
         assert_eq!(result, Ok(vec![TableUsage {
             name: "users".to_string(),
             usages: Vec::new(),
@@ -16,8 +16,8 @@ mod tests {
     #[test]
     fn test_select_query_002() {
         let query = "SELECT * FROM users WHERE id = 1;";
-        let mut analyzer = QueryUsageAnalyzer::new();
-        let result = analyzer.analyze(query);
+        let mut parser = QueryUsageParser::new();
+        let result = parser.parse(query);
         assert_eq!(result, Ok(vec![TableUsage {
             name: "users".to_string(),
             usages: vec![ColumnUsage {
@@ -30,8 +30,8 @@ mod tests {
     #[test]
     fn test_insert_query_001() {
         let query = "INSERT INTO users (name, age) VALUES ('John', 30);";
-        let mut analyzer = QueryUsageAnalyzer::new();
-        let result = analyzer.analyze(query);
+        let mut parser = QueryUsageParser::new();
+        let result = parser.parse(query);
         assert_eq!(result, Ok(vec![TableUsage {
             name: "users".to_string(),
             usages: Vec::new(),
@@ -41,8 +41,8 @@ mod tests {
     #[test]
     fn test_update_query_001() {
         let query = "UPDATE users SET name = 'John' WHERE id = 1;";
-        let mut analyzer = QueryUsageAnalyzer::new();
-        let result = analyzer.analyze(query);
+        let mut parser = QueryUsageParser::new();
+        let result = parser.parse(query);
         assert_eq!(result, Ok(vec![TableUsage {
             name: "users".to_string(),
             usages: vec![ColumnUsage {

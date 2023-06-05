@@ -5,7 +5,7 @@ use sqlparser::dialect::PostgreSqlDialect;
 use sqlparser::parser::Parser;
 
 mod test;
-mod analyzer;
+mod parser;
 
 #[derive(Debug, PartialEq, Clone)]
 enum OperationType {
@@ -31,7 +31,7 @@ struct TableUsage {
     usages: Vec<ColumnUsage>,
 }
 
-struct QueryUsageAnalyzer {
+struct QueryUsageParser {
     dialect: PostgreSqlDialect,
     table_usages: Vec<TableUsage>,
 }

@@ -2,15 +2,15 @@ use sqlparser::ast::{Query, SetExpr, TableWithJoins};
 
 use crate::query::*;
 
-impl QueryUsageAnalyzer {
+impl QueryUsageParser {
     pub fn new() -> Self {
-        QueryUsageAnalyzer {
+        QueryUsageParser {
             dialect: PostgreSqlDialect {},
             table_usages: Vec::new(),
         }
     }
 
-    pub fn analyze(&mut self, query: &str) -> Result<Vec<TableUsage>, String> {
+    pub fn parse(&mut self, query: &str) -> Result<Vec<TableUsage>, String> {
         let ast = Parser::parse_sql(&self.dialect, query).expect("Error parsing SQL");
 
         for statement in ast {
