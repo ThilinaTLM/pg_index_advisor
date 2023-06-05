@@ -1,3 +1,5 @@
+mod query;
+
 use pgx::prelude::*;
 use sqlparser::parser::Parser;
 use sqlparser::dialect::PostgreSqlDialect;
