@@ -1,47 +1,55 @@
 use std::io;
 
-struct Table {
+struct ColInfoObj {
     table_name: String,
     column_name: String,
     column_dtype: String,
+    operator: String,
     row_count: i16,
     rating: i8,
 }
 
 fn main() {
-    let mut tables: Vec<Table> = Vec::new();
+    let mut col_info_arr: Vec<ColInfoObj> = Vec::new();
 
     loop {
-        let table_name = get_input("Enter table name: ");
+        println!("-----------------------------");
+        let table_name = get_input("Enter table name (\"end\" to terminate): ");
         if table_name == "end" {
             break;
         }
 
         let column_name = get_input("Enter column name: ");
         let column_dtype = get_input("Enter column data type: ");
+        let operator = get_input("Enter operator type: ");
         let row_count: i16 = get_input_as_number("Enter row count: ");
         let rating: i8 = get_input_as_number("Enter rating: ");
 
-        let table = Table {
+        let table = ColInfoObj {
             table_name,
             column_name,
             column_dtype,
+            operator,
             row_count,
             rating,
         };
 
-        tables.push(table);
+        col_info_arr.push(table);
     }
 
     // Print the array of struct objects
-    for table in tables {
-        println!("Table Name: {}", table.table_name);
-        println!("Column Name: {}", table.column_name);
-        println!("Column Data Type: {}", table.column_dtype);
-        println!("Row Count: {}", table.row_count);
-        println!("Rating: {}", table.rating);
+    for obj in col_info_arr {
+        println!("-----------------------------");
+        println!("Table Name: {}", obj.table_name);
+        println!("Column Name: {}", obj.column_name);
+        println!("Column Data Type: {}", obj.column_dtype);
+        println!("Operator: {}", obj.operator);
+        println!("Row Count: {}", obj.row_count);
+        println!("Rating: {}", obj.rating);
         println!("-----------------------------");
     }
+
+
 }
 
 fn get_input(prompt: &str) -> String {
