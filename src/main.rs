@@ -98,7 +98,7 @@ fn main() {
                     let index_obj = ColIndexObj {
                         table_name: obj.table_name,
                         column_name: obj.column_name,
-                        suggested_index: "B-tree".to_string(),
+                        suggested_index: "B-Tree".to_string(),
                         rating: obj.rating,
                     };
 
