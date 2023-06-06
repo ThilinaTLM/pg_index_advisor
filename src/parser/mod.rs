@@ -36,3 +36,9 @@ struct QueryUsageParser {
     table_usages: Vec<TableUsage>,
 }
 
+
+pub fn parse_query(query: &str) -> Result<Vec<TableUsage>, ()> {
+    let mut parser = QueryUsageParser::new();
+    let table_usage = parser.parse(query).unwrap();
+    Ok(table_usage)
+}

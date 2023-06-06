@@ -1,6 +1,6 @@
 use sqlparser::ast::{Query, SetExpr, TableWithJoins};
 
-use crate::query::*;
+use crate::parser::*;
 
 impl QueryUsageParser {
     pub fn new() -> Self {
