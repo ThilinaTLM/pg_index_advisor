@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use crate::algorithm::algo1::generate_index_suggestion;
     use super::*;
     use super::super::*;
 
@@ -54,7 +53,7 @@ mod tests {
         let stats_arr: Vec<&Statistics> = vec![&stats1, &stats2, &stats3];
 
         // Call the method
-        let result = generate_index_suggestion(&statement, &stats_arr);
+        let result = Algorithm1.generate_index_suggestion(&statement, &stats_arr);
 
         // Assert the result
         assert_eq!(result.len(), 3);
