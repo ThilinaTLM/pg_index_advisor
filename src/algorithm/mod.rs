@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-pub mod algo1;
+pub mod rule_based_v1;
 mod test;
 
 use std::io;
@@ -21,4 +21,4 @@ pub struct ColIndexObj {
     rating: i8,
 }
 
-pub struct Algorithm1;
+pub struct RuleBasedV1;

@@ -1,6 +1,6 @@
 use crate::algorithm::*;
 
-impl Algorithm for Algorithm1{
+impl Algorithm for RuleBasedV1{
     fn generate_index_suggestion(&self, statement: &sqlparser::ast::Statement, stats: &[&Statistics]) -> Vec<ColIndexObj> {
         let mut col_index_arr: Vec<ColIndexObj> = Vec::new();
 
