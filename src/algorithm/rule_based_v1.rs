@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::algorithm::*;
 
 impl Algorithm for RuleBasedV1{
@@ -11,6 +12,7 @@ impl Algorithm for RuleBasedV1{
                 "array" | "jsonb" | "range" => {
                     println!("GIN Index Suggested");
                     let index_obj = ColIndexObj {
+                        schema_name: obj.schema_name.clone(),
                         table_name: obj.table_name.clone(),
                         column_name: obj.column_name.clone(),
                         suggested_index: "GIN".to_string(),
@@ -23,6 +25,7 @@ impl Algorithm for RuleBasedV1{
                 "complex" => {
                     println!("GiST Index Suggested");
                     let index_obj = ColIndexObj {
+                        schema_name: obj.schema_name.clone(),
                         table_name: obj.table_name.clone(),
                         column_name: obj.column_name.clone(),
                         suggested_index: "GiST".to_string(),
@@ -44,6 +47,7 @@ impl Algorithm for RuleBasedV1{
                     if obj.row_count >= ROW_COUNT_THRESHOLD {
                         println!("BRIN Index Suggested");
                         let index_obj = ColIndexObj {
+                            schema_name: obj.schema_name.clone(),
                             table_name: obj.table_name.clone(),
                             column_name: obj.column_name.clone(),
                             suggested_index: "BRIN".to_string(),
@@ -54,6 +58,7 @@ impl Algorithm for RuleBasedV1{
                     } else {
                         println!("B-Tree Index Suggested");
                         let index_obj = ColIndexObj {
+                            schema_name: obj.schema_name.clone(),
                             table_name: obj.table_name.clone(),
                             column_name: obj.column_name.clone(),
                             suggested_index: "B-Tree".to_string(),
@@ -68,6 +73,7 @@ impl Algorithm for RuleBasedV1{
                 _ => {
                     println!("B-Tree Index Suggested");
                     let index_obj = ColIndexObj {
+                        schema_name: obj.schema_name.clone(),
                         table_name: obj.table_name.clone(),
                         column_name: obj.column_name.clone(),
                         suggested_index: "B-Tree".to_string(),
@@ -78,7 +84,56 @@ impl Algorithm for RuleBasedV1{
                 }
             }
         }
-        col_index_arr // Return the vector
+        col_index_arr
+        // Read the array and
     }
+
+    fn generate_table_index_obj(&self, col_index_objs: &[ColIndexObj]) -> TableIndexObj {
+        let mut table_index_obj = TableIndexObj {
+            schema_name: None,
+            table_name: String::new(),
+            column_indexes: HashMap::new(),
+        };
+
+        for col_index_obj in col_index_objs {
+            if table_index_obj.table_name.is_empty() {
+                table_index_obj.table_name = col_index_obj.table_name.clone();
+                table_index_obj.schema_name = col_index_obj.schema_name.clone();
+            }
+
+            if col_index_obj.table_name != table_index_obj.table_name
+                || col_index_obj.schema_name != table_index_obj.schema_name
+            {
+                continue;
+            }
+
+            let column_name = &col_index_obj.column_name;
+            let column_index = table_index_obj.column_indexes.entry(column_name.clone()).or_default();
+            let matching_index = column_index.iter_mut().find(|c| &c.column_name == column_name);
+
+            if let Some(existing_index) = matching_index {
+                existing_index.suggested_indexes.push(IndexRating {
+                    index: col_index_obj.suggested_index.clone(),
+                    rating: col_index_obj.rating,
+                });
+                existing_index.totalRating += col_index_obj.rating;
+            } else {
+                column_index.push(ColAllIndexObj {
+                    schema_name: col_index_obj.schema_name.clone(),
+                    column_name: col_index_obj.column_name.clone(),
+                    table_name: col_index_obj.table_name.clone(),
+                    suggested_indexes: vec![IndexRating {
+                        index: col_index_obj.suggested_index.clone(),
+                        rating: col_index_obj.rating,
+                    }],
+                    totalRating: col_index_obj.rating,
+                });
+            }
+        }
+
+        table_index_obj
+    }
+
+
 }
 

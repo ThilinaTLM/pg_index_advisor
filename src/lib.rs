@@ -3,6 +3,7 @@ use sqlparser::ast::{Expr, ObjectName, SelectItem, Statement, Table, TableFactor
 use sqlparser::dialect::PostgreSqlDialect;
 use sqlparser::parser::Parser;
 
+
 mod query;
 mod algorithm;
 
@@ -77,6 +78,7 @@ fn collect_statistics(statement: &sqlparser::ast::Statement) -> Result<String, S
 }
 
 pub struct Statistics {
+    schema_name: Option<String>,
     table_name: String,
     column_name: String,
     column_dtype: String,
