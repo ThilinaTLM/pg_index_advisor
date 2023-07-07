@@ -5,7 +5,7 @@ use sqlparser::parser::Parser;
 
 mod parser;
 mod schema;
-mod algorithm;
+// mod algorithm;
 
 pgx::pg_module_magic!();
 

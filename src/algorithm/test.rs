@@ -3,6 +3,7 @@
 #[allow(unused_assignments)]
 
 mod tests {
+    use crate::parser::parse_query;
     use super::*;
     use super::super::*;
 

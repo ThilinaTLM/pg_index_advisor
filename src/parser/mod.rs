@@ -20,18 +20,18 @@ enum OperationType {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-struct ColumnUsage {
+pub struct ColumnUsage {
     column: String,
     operation: OperationType,
 }
 
 #[derive(Debug, PartialEq, Clone)]
-struct TableUsage {
+pub struct TableUsage {
     name: String,
     usages: Vec<ColumnUsage>,
 }
 
-struct QueryUsageParser {
+pub struct QueryUsageParser {
     dialect: PostgreSqlDialect,
     table_usages: Vec<TableUsage>,
 }
