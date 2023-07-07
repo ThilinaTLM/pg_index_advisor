@@ -61,9 +61,7 @@ mod tests {
         // Call the method
         let result = RuleBasedV1.generate_index_suggestion(&statement, &stats_arr);
 
-        let tableIndex = RuleBasedV1.generate_table_index_obj( &result);
-        println!("{:?}", tableIndex);
-        println!("hey checking");
+        let table_index = RuleBasedV1.generate_table_index_obj( &result);
 
         // Assert the result
         assert_eq!(result.len(), 3);
