@@ -15,6 +15,7 @@ fn hello_pg_index_advisor() -> &'static str {
 }
 
 pub struct Statistics {
+    schema_name: Option<String>,
     table_name: String,
     column_name: String,
     column_dtype: String,

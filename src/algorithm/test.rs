@@ -1,4 +1,7 @@
 #[cfg(test)]
+
+#[allow(unused_assignments)]
+
 mod tests {
     use super::*;
     use super::super::*;
@@ -7,6 +10,7 @@ mod tests {
     fn test_generate_index_suggestion() {
         // Create sample statistics
         let stats1 = Statistics {
+            schema_name: None,
             table_name: "table1".to_string(),
             column_name: "column1".to_string(),
             column_dtype: "array".to_string(),
@@ -20,6 +24,7 @@ mod tests {
         };
 
         let stats2 = Statistics {
+            schema_name: None,
             table_name: "table2".to_string(),
             column_name: "column2".to_string(),
             column_dtype: "integer".to_string(),
@@ -33,6 +38,7 @@ mod tests {
         };
 
         let stats3 = Statistics {
+            schema_name: None,
             table_name: "table2".to_string(),
             column_name: "column3".to_string(),
             column_dtype: "integer".to_string(),
@@ -53,14 +59,16 @@ mod tests {
         let stats_arr: Vec<&Statistics> = vec![&stats1, &stats2, &stats3];
 
         // Call the method
-        let result = Algorithm1.generate_index_suggestion(&statement, &stats_arr);
+        let result = RuleBasedV1.generate_index_suggestion(&statement, &stats_arr);
+
+        let table_index = RuleBasedV1.generate_table_index_obj( &result);
 
         // Assert the result
         assert_eq!(result.len(), 3);
 
         // Check the first index suggestion
         let index1 = &result[0];
-        print!("{:?}", index1);
+        println!("{:?}", index1);
         assert_eq!(index1.table_name, "table1");
         assert_eq!(index1.column_name, "column1");
         assert_eq!(index1.suggested_index, "GIN");
