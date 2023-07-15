@@ -1,31 +1,54 @@
-use sqlparser::ast::{Query, SetExpr, TableWithJoins};
+use sqlparser::ast::{Query, SetExpr, Statement, TableWithJoins};
 
 use crate::parser::*;
 
-impl QueryUsageParser {
+#[derive(Debug, PartialEq, Clone)]
+pub enum QueryParserError {
+    InvalidStatementType,
+    UnsupportedOperation,
+    ParseError,
+    InvalidTableName,
+}
+
+pub struct QueryParser {
+    usages: Vec<ColumnUsage>,
+}
+
+impl QueryParser {
     pub fn new() -> Self {
-        QueryUsageParser {
-            dialect: PostgreSqlDialect {},
-            table_usages: Vec::new(),
+        QueryParser {
+            usages: Vec::new(),
         }
     }
 
-    pub fn parse(&mut self, query: &str) -> Result<Vec<TableUsage>, String> {
-        let ast = Parser::parse_sql(&self.dialect, query).expect("Error parsing SQL");
+    pub fn record_usage(&mut self, table_name: &str, column_name: &str, operation: OperationType) {
+        self.usages.push(ColumnUsage {
+            schema: "".to_string(),
+            table: table_name.to_string(),
+            column: column_name.to_string(),
+            operation,
+        });
+    }
+
+    pub fn parse(&mut self, query: &str) -> Result<Vec<ColumnUsage>, QueryParserError> {
+        let ast: Vec<Statement> = Parser::parse_sql(&PostgreSqlDialect {}, query)
+            .map_err(|_| QueryParserError::ParseError)?;
+
+
 
         for statement in ast {
             match statement {
-                sqlparser::ast::Statement::Query(query) => {
+                Statement::Query(query) => {
                     match *query.body {
                         SetExpr::Select(select) => {
                             let table_name = match &select.from.first() {
                                 Some(TableWithJoins { ref relation, .. }) => {
                                     match relation {
                                         TableFactor::Table { ref name, .. } => name.to_string(),
-                                        _ => return Err("Invalid table name".to_string()),
+                                        _ => return Err(QueryParserError::InvalidTableName),
                                     }
                                 }
-                                _ => return Err("Invalid table name".to_string()),
+                                _ => return Err(QueryParserError::InvalidTableName),
                             };
 
                             // Handle selection (WHERE clause)
@@ -35,25 +58,25 @@ impl QueryUsageParser {
                                 Vec::new()
                             };
 
-                            self.table_usages.push(TableUsage {
-                                name: table_name.to_string(),
-                                usages: column_usages,
-                            });
+                            // self.table_usages.push(TableUsage {
+                            //     name: table_name.to_string(),
+                            //     usages: column_usages,
+                            // });
                         }
                         _ => {}
                     }
                 }
-                sqlparser::ast::Statement::Insert { table_name, .. } => {
-                    self.table_usages.push(TableUsage {
-                        name: table_name.to_string(),
-                        usages: Vec::new(),
-                    });
+                Statement::Insert { table_name, .. } => {
+                    // self.table_usages.push(TableUsage {
+                    //     name: table_name.to_string(),
+                    //     usages: Vec::new(),
+                    // });
                 }
-                sqlparser::ast::Statement::Update { table, selection, .. } => {
+                Statement::Update { table, selection, .. } => {
                     // Extract table name
                     let table_name = match table.relation {
                         TableFactor::Table { name, .. } => name.to_string(),
-                        _ => return Err("Invalid table name".to_string()),
+                        _ => return Err(QueryParserError::InvalidTableName),
                     };
 
                     // Handle selection (WHERE clause)
@@ -63,16 +86,16 @@ impl QueryUsageParser {
                         Vec::new()
                     };
 
-                    self.table_usages.push(TableUsage {
-                        name: table_name.to_string(),
-                        usages: column_usages,
-                    });
+                    // self.table_usages.push(TableUsage {
+                    //     name: table_name.to_string(),
+                    //     usages: column_usages,
+                    // });
                 }
-                _ => return Err("Invalid statement type".to_string()),
+                _ => return Err(QueryParserError::InvalidStatementType),
             }
         }
 
-        Ok(self.table_usages.clone())
+        Ok(self.usages.clone())
     }
 
     fn analyze_where_clause(&self, expr: &Expr) -> Option<Vec<ColumnUsage>> {
@@ -90,6 +113,8 @@ impl QueryUsageParser {
                     | BinaryOperator::Divide
                     | BinaryOperator::Modulo => {
                         column_usages.push(ColumnUsage {
+                            schema: "".to_string(),
+                            table: "".to_string(),
                             column: column_name,
                             operation: OperationType::Algebraic,
                         })
@@ -107,12 +132,16 @@ impl QueryUsageParser {
                     | BinaryOperator::BitwiseAnd
                     | BinaryOperator::BitwiseXor => {
                         column_usages.push(ColumnUsage {
+                            schema: "".to_string(),
+                            table: "".to_string(),
                             column: column_name,
                             operation: OperationType::Comparison,
                         })
                     }
                     BinaryOperator::StringConcat => {
                         column_usages.push(ColumnUsage {
+                            schema: "".to_string(),
+                            table: "".to_string(),
                             column: column_name,
                             operation: OperationType::String,
                         })
@@ -125,6 +154,8 @@ impl QueryUsageParser {
             | Expr::SimilarTo { expr, .. } => {
                 if let Expr::Identifier(id) = expr.as_ref() {
                     column_usages.push(ColumnUsage {
+                        schema: "".to_string(),
+                        table: "".to_string(),
                         column: id.to_string(),
                         operation: OperationType::StringPattern,
                     });
@@ -134,6 +165,8 @@ impl QueryUsageParser {
             | Expr::IsNotNull(expr) => {
                 if let Expr::Identifier(id) = expr.as_ref() {
                     column_usages.push(ColumnUsage {
+                        schema: "".to_string(),
+                        table: "".to_string(),
                         column: id.to_string(),
                         operation: OperationType::NullCheck,
                     });
