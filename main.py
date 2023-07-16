@@ -1,11 +1,11 @@
 import psycopg2
 
-from helper import execute_ddl, get_device
+from helper import execute_ddl
 from environment import Environment
 from agent import Agent
 
 learning_rate = 0.001
-execution_threshold = 0.05
+execution_threshold = 0.001
 epoches = 100
 
 # Execute the DDL
@@ -15,7 +15,7 @@ execute_ddl()
 conn = psycopg2.connect(database="pgx_advisor", user="yasith", password="21717", host="127.0.0.1", port="5432")
 
 # Initialize the environment and the agent
-env = Environment(conn, "title_akas", execution_threshold)
+env = Environment(conn, "laptop_detail", execution_threshold)
 agent = Agent(len(env.get_state()), len(env.get_action_space()), learning_rate)
 
 # Train the agent

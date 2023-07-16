@@ -5,10 +5,10 @@ def execute_ddl():
     con = psycopg2.connect(database="pgx_advisor", user="yasith", password="21717", host="localhost")
 
     # drop table if exists
-    con.cursor().execute("DROP TABLE IF EXISTS title_akas")
+    con.cursor().execute("DROP TABLE IF EXISTS laptop_detail")
     con.commit()
 
-    with open("./queries/ddl.sql", "r") as f:
+    with open("queries/train/ddl_laptop_detail.sql", "r") as f:
         con.cursor().execute(f.read())
         print("Table Created!\n")
 
