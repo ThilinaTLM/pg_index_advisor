@@ -9,13 +9,13 @@ mod tests {
         assert_eq!(true, true)
     }
 
-    // #[test]
-    // fn test_select_query_002() {
-    //     let query = "SELECT * FROM users WHERE id = 1;";
-    //     let result = parse_query(query);
-    //
-    // }
-    //
+    #[test]
+    fn test_select_query_002() {
+        let query = "SELECT * FROM users WHERE id = 1;";
+        let result = extract(query);
+        assert_eq!(true, true)
+    }
+
     // #[test]
     // fn test_insert_query_001() {
     //     let query = "INSERT INTO users (name, age) VALUES ('John', 30);";

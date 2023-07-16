@@ -1,9 +1,11 @@
 #![allow(dead_code)]
 
-use sqlparser::ast::{Assignment, BinaryOperator, Expr, Select, SelectItem, SetExpr, Statement, TableFactor, Value};
+use sqlparser::ast::Query;
+use sqlparser::ast::{
+    Assignment, BinaryOperator, Expr, Select, SelectItem, SetExpr, Statement, TableFactor, Value,
+};
 use sqlparser::dialect::PostgreSqlDialect;
 use sqlparser::parser::Parser;
-use sqlparser::ast::Query;
 
 mod test;
 
@@ -34,7 +36,7 @@ pub fn extract(query: &str) -> Vec<ColumnUsage> {
     for statement in ast {
         match statement {
             Statement::Query(query) => {
-                let mut select_column_usages = extract_select(query);
+                let mut select_column_usages = extract_query(query);
                 column_usages.append(&mut select_column_usages);
             }
             _ => {
@@ -49,7 +51,7 @@ fn extract_query(query: Box<Query>) -> Vec<ColumnUsage> {
     let mut column_usages = Vec::new();
 
     // analyze body
-    match query.body {
+    match *query.body {
         SetExpr::Select(select) => {
             let mut select_column_usages = extract_select(select);
             column_usages.append(&mut select_column_usages);
@@ -107,11 +109,19 @@ fn extract_from_expr(expr: &Expr, column_usages: &mut Vec<ColumnUsage>, depth: i
 
             // Assign operations based on your criteria
             let operation = match op {
-                BinaryOperator::Plus | BinaryOperator::Minus | BinaryOperator::Multiply | BinaryOperator::Divide
-                => OperationType::Algebraic,
-                BinaryOperator::Eq | BinaryOperator::NotEq | BinaryOperator::Lt | BinaryOperator::LtEq |
-                BinaryOperator::Gt | BinaryOperator::GtEq => OperationType::Comparison,
-                BinaryOperator::And | BinaryOperator::Or | BinaryOperator::Not => OperationType::Logical,
+                BinaryOperator::Plus
+                | BinaryOperator::Minus
+                | BinaryOperator::Multiply
+                | BinaryOperator::Divide => OperationType::Algebraic,
+                BinaryOperator::Eq
+                | BinaryOperator::NotEq
+                | BinaryOperator::Lt
+                | BinaryOperator::LtEq
+                | BinaryOperator::Gt
+                | BinaryOperator::GtEq => OperationType::Comparison,
+                BinaryOperator::And | BinaryOperator::Or | BinaryOperator::NotEq => {
+                    OperationType::Logical
+                }
                 _ => OperationType::Other,
             };
 
@@ -135,7 +145,7 @@ fn extract_from_expr(expr: &Expr, column_usages: &mut Vec<ColumnUsage>, depth: i
         }
         Expr::Subquery(subquery) => {
             // Extract from subquery, incrementing the depth
-            let mut subquery_usages = extract_query(subquery?);
+            let mut subquery_usages = extract_query(subquery.clone());
             for usage in &mut subquery_usages {
                 usage.weight += depth; // Or some other function to modify weight based on depth
             }

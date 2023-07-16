@@ -54,3 +54,17 @@ struct SchemaIndexObj {
 }
 
 pub struct RuleBasedV1;
+
+pub struct Statistics {
+    schema_name: Option<String>,
+    table_name: String,
+    column_name: String,
+    column_dtype: String,
+    row_count: i64,
+    page_count: i32,
+    n_distinct: f64,
+    rating: i8,
+    operator: String,
+    most_common_vals: Option<Vec<f64>>,
+    most_common_freqs: Option<Vec<f64>>,
+}
