@@ -1,5 +1,5 @@
 import psycopg2
-import time
+import torch
 
 def execute_ddl():
     con = psycopg2.connect(database="pgx_advisor", user="yasith", password="21717", host="localhost")
@@ -9,10 +9,12 @@ def execute_ddl():
     con.commit()
 
     with open("./queries/ddl.sql", "r") as f:
-        start = time.time()
         con.cursor().execute(f.read())
         print("Table Created!\n")
 
     con.commit()
     con.cursor().close()
     con.close()
+
+def get_device():
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")

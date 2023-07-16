@@ -1,12 +1,12 @@
 import psycopg2
 
-from helper import execute_ddl
+from helper import execute_ddl, get_device
 from environment import Environment
 from agent import Agent
 
 learning_rate = 0.001
-execution_threshold = 1.7
-epoches = 50
+execution_threshold = 0.05
+epoches = 100
 
 # Execute the DDL
 execute_ddl()
