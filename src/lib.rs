@@ -1,7 +1,7 @@
 use pgx::prelude::*;
 
 mod parser;
-mod schema;
+mod repos;
 
 // mod algorithm;
 
@@ -15,7 +15,7 @@ fn pgia_health_check() -> String {
 
 #[pg_extern]
 fn pgia_test() -> String {
-    let result = schema::SchemaRepo::get_columns("test_table");
+    let result = repos::SchemaRepo::get_columns("test_table");
     match result {
         Ok(columns) => {
             let mut result = String::new();
