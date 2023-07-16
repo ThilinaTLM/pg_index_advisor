@@ -4,6 +4,7 @@ import torch.optim as optim
 import numpy as np
 from collections import deque
 import random
+
 from model import DQN
 
 class Agent:
@@ -34,8 +35,10 @@ class Agent:
 
     def get_action(self, state, action_space, epsilon):
         if np.random.rand() < epsilon:
-            return random.choice(action_space)
+            print("Random action")
+            return random.randint(0, len(action_space)-1)
         else:
+            print("Greedy action")
             return self.dqn(torch.tensor(state, dtype=torch.float)).argmax().item()
 
     def save_model(self, path):
