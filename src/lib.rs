@@ -1,3 +1,5 @@
+use std::{fs::File, io::{BufReader, Read}};
+
 use pgx::prelude::*;
 
 mod parser;
@@ -31,27 +33,26 @@ fn pgia_test() -> String {
     }
 }
 
+#[pg_extern]
+fn pgia_suggest_index(file_path: String) -> String {
+    // Attempt to open the file
+    let file = match File::open(&file_path) {
+        Err(error) => return format!("Couldn't open file: {}", error),
+        Ok(file) => file,
+    };
 
-#[cfg(any(test, feature = "pg_test"))]
-mod tests {
-    // #[pg_test]
-    // fn test_health_check() {
+    // Create a BufReader to handle reading of the file
+    let mut reader = BufReader::new(file);
 
-    //     assert_eq!("OK", "OK");
-    // }
-}
+    // Create a String to store the file contents
+    let mut content = String::new();
 
-/// This module is required by `cargo pgx test` invocations.
-/// It must be visible at the root of your extension crate.
-#[cfg(test)]
-pub mod pg_test {
-    
-    pub fn setup(_options: Vec<&str>) {
-        // perform one-off initialization when the pg_test framework starts
-    }
+    // Attempt to read the file into the content String
+    match reader.read_to_string(&mut content) {
+        Err(error) => return format!("Couldn't read file: {}", error),
+        Ok(_) => {},
+    };
 
-    pub fn postgresql_conf_options() -> Vec<&'static str> {
-        // return any postgresql.conf settings that are required for your tests
-        vec![]
-    }
+    // Return the contents of the file
+    content
 }
