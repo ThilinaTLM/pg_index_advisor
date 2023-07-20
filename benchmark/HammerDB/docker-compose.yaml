@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    container_name: pg_server_t
+    image: postgres:13
+    network_mode: host
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: pg_test
+
+  hammerdb:
+    container_name: hammerdb_t
+    image: tpcorg/hammerdb:postgres
+    depends_on:
+      - db
+    restart: always
+    network_mode: host
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: pg_test
+
