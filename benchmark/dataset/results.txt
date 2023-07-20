@@ -1,0 +1,23 @@
+Table 1: customer
+
+Running time without indexes : 36781  ms
+Running time with indexes : 32774  ms
+Customer table size : 199 MB
+
+Table 2: district
+
+Running time without indexes : 52 ms
+Running time with indexes : 54 ms
+district table size : 57 KB
+
+Table 3: history
+
+Running time without indexes :  4791 ms
+Running time with indexes :  4749 ms
+Customer table size : 27 MB
+
+Table 4: orders
+
+Running time without indexes : 6323 seconds
+Running time with indexes :  5694 second
+Customer table size : 27 MB
